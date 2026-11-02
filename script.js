@@ -8,16 +8,22 @@ const highScoreElem = document.querySelector("#high-score");
 const scoreElem = document.querySelector("#score");
 const timeElem = document.querySelector("#time");
 
+const eatSound = new Audio("sounds/nahtt-eat-323883.mp3");
+const gameOverSound = new Audio("sounds/freesound_community-wrong-buzzer-6268.mp3");
+
 const blockHeight = 50;
 const blockWidth = 50;
 
-let highScore = 0;
+let highScore = Number(localStorage.getItem("highScore")) || 0;
+
+highScoreElem.innerText = highScore;
 let score = 0;
-let time = `00-00`
+let time = `00-00`;
 
 const cols = Math.floor(board.clientWidth / blockWidth);
 const rows = Math.floor(board.clientHeight / blockHeight);
 let intervalId = null;
+let timerIntervalId = null;
 let food = {
   x: Math.floor(Math.random() * rows),
   y: Math.floor(Math.random() * cols),
@@ -48,7 +54,6 @@ for (let row = 0; row < rows; row++) {
     const block = document.createElement("div");
     block.classList.add("block");
     board.appendChild(block);
-    block.innerText = `${row},${col}`;
     blocks[`${row}-${col}`] = block;
   }
 }
@@ -69,7 +74,10 @@ function render() {
   }
 
   if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
+    gameOverSound.currentTime = 0;
+    gameOverSound.play().catch(() => {});
     clearInterval(intervalId);
+    clearInterval(timerIntervalId);
     modal.style.display = "flex";
     startGameModal.style.display = "none";
     gameOverModal.style.display = "flex";
@@ -78,6 +86,8 @@ function render() {
 
   //to add food in head whenever it consumes it the head increases
   if (head.x == food.x && head.y == food.y) {
+    eatSound.currentTime = 0;
+    eatSound.play().catch(() => {});
     blocks[`${food.x}-${food.y}`].classList.remove("food");
     food = {
       x: Math.floor(Math.random() * rows),
@@ -89,9 +99,10 @@ function render() {
     score += 10;
     scoreElem.innerText = score;
 
-    if(score > highScore){
+    if (score > highScore) {
       highScore = score;
-      localStorage.setItem("highScore", highScore.toString())
+      localStorage.setItem("highScore", highScore.toString());
+      highScoreElem.innerText = highScore;
     }
   }
 
@@ -114,12 +125,29 @@ startButton.addEventListener("click", () => {
   intervalId = setInterval(() => {
     render();
   }, 300);
+  timerIntervalId = setInterval(() => {
+    let [min, sec] = time.split("-").map(Number);
+
+    if (sec == 59) {
+      min += 1;
+      sec = 0;
+    } else {
+      sec += 1;
+    }
+
+    time = `${String(min).padStart(2, "0")}-${String(sec).padStart(2, "0")}`;
+    timeElem.innerText = time;
+  }, 1000);
 });
 
 restartButton.addEventListener("click", restartGame);
 
 function restartGame() {
+  gameOverSound.pause();
+  gameOverSound.currentTime = 0;
   clearInterval(intervalId); // Stop the previous game
+  clearInterval(timerIntervalId);
+  score = 0;
 
   // Remove the old snake and food from the board
   document.querySelectorAll(".fill").forEach((block) => {
@@ -129,6 +157,13 @@ function restartGame() {
   document.querySelectorAll(".food").forEach((block) => {
     block.classList.remove("food");
   });
+
+  score = 0;
+  time = "00-00";
+
+  scoreElem.innerText = score;
+  timeElem.innerText = time;
+  highScoreElem.innerText = highScore;
 
   // Reset the snake
   snake = [{ x: 1, y: 3 }];
@@ -147,6 +182,19 @@ function restartGame() {
 
   // Start a fresh game
   intervalId = setInterval(render, 300);
+  timerIntervalId = setInterval(() => {
+    let [min, sec] = time.split("-").map(Number);
+
+    if (sec == 59) {
+      min += 1;
+      sec = 0;
+    } else {
+      sec += 1;
+    }
+
+    time = `${String(min).padStart(2, "0")}-${String(sec).padStart(2, "0")}`;
+    timeElem.innerText = time;
+  }, 1000);
 }
 
 // script.js:68 ArrowUp

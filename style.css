@@ -20,13 +20,13 @@ body {
   --text-primary-color: #f0f0f0;
 
   /* Spacing */
-  --space-xs:4px;
-  --space-sm:8px;
-  --space-md:16px;
-  --space-lg:24px;
-  --space-xl:32px;
-  --space-2xl:40px;
-  --space-3xl:48px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 40px;
+  --space-3xl: 48px;
 
   /* Border colors */
   --border-primary-color: #333333;
@@ -63,7 +63,7 @@ section {
   height: 100%;
 }
 
-.btn{
+.btn {
   padding: var(--space-sm) var(--space-md);
   border: none;
   border-radius: var(--border-radius-sm);
@@ -71,7 +71,7 @@ section {
   transition: all 0.3s ease;
 }
 
-.btn:hover{
+.btn:hover {
   transform: scale(1.1);
 }
 
@@ -82,40 +82,43 @@ section {
   height: 100%;
   gap: var(--space-lg)
 }
+
 section .infos {
   width: 100%;
   display: flex;
   justify-content: space-between;
 }
 
-.info{
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--border-primary-color);
-    border-radius: var(--border-radius-sm);
-}
-.board{
-    border: 1px solid var(--border-primary-color);
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    grid-template-rows: repeat(auto-fill, minmax(50px, 1fr));
+.info {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-primary-color);
+  border-radius: var(--border-radius-sm);
 }
 
-.block{
+.board {
+  border: 1px solid var(--border-primary-color);
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(50px, 1fr));
+}
+
+.block {
   /* width:50px;
   height:50px; */
   border: 1px solid var(--border-primary-color);
+  border-radius: 50%;
 }
 
-.fill{
+.fill {
   background-color: var(--bg-fill-color);
 }
 
-.food{
+.food {
   background-color: var(--bg-food-color);
 }
 
-.modal{
+.modal {
   height: 100vh;
   width: 100vw;
   position: fixed;
@@ -128,13 +131,13 @@ section .infos {
 }
 
 .modal .start-game,
-.modal .game-over{
+.modal .game-over {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-lg);
 }
 
-.modal .game-over{
+.modal .game-over {
   display: none;
 }
