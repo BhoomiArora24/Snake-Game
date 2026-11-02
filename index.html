@@ -28,6 +28,33 @@
             </div>
             <div class="board">
             </div>
+            <div class="controls-wrapper">
+                <div class="control-modes">
+                    <button type="button" class="mode-btn" data-mode="joystick">🕹️ Joystick</button>
+                    <button type="button" class="mode-btn" data-mode="dpad">🎛️ D-Pad</button>
+                </div>
+                <!-- Joystick Control -->
+                <div class="joystick-wrapper" id="joystick-wrapper">
+                    <div class="joystick-base" id="joystick-base">
+                        <span class="joy-indicator joy-up">▲</span>
+                        <span class="joy-indicator joy-down">▼</span>
+                        <span class="joy-indicator joy-left">◀</span>
+                        <span class="joy-indicator joy-right">▶</span>
+                        <div class="joystick-knob" id="joystick-knob"></div>
+                    </div>
+                </div>
+                <!-- D-Pad Buttons Control -->
+                <div class="controls dpad-controls" id="dpad-controls" style="display: none;">
+                    <div class="controls-row">
+                        <button type="button" class="ctrl-btn up" data-dir="up" aria-label="Up">▲</button>
+                    </div>
+                    <div class="controls-row">
+                        <button type="button" class="ctrl-btn left" data-dir="left" aria-label="Left">◀</button>
+                        <button type="button" class="ctrl-btn down" data-dir="down" aria-label="Down">▼</button>
+                        <button type="button" class="ctrl-btn right" data-dir="right" aria-label="Right">▶</button>
+                    </div>
+                </div>
+            </div>
         </section>
         <div class="modal">
             <div class="start-game">
@@ -36,7 +63,7 @@
             </div>
             <div class="game-over">
                 <h3>Game Over</h3>
-                <button class="btn btn-restart" >Restart Game</button>
+                <button class="btn btn-restart">Restart Game</button>
             </div>
         </div>
     </main>

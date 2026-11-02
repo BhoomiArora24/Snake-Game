@@ -197,18 +197,134 @@ function restartGame() {
   }, 1000);
 }
 
-// script.js:68 ArrowUp
-// script.js:68 ArrowDown
-// script.js:68 ArrowLeft
-// script.js:68 ArrowRight
+function setDirection(newDir) {
+  if (!newDir) return;
+  if (snake.length > 1) {
+    if (newDir === "up" && direction === "down") return;
+    if (newDir === "down" && direction === "up") return;
+    if (newDir === "left" && direction === "right") return;
+    if (newDir === "right" && direction === "left") return;
+  }
+  direction = newDir;
+}
+
+// Keyboard controls
 addEventListener("keydown", (event) => {
-  if (event.key == "ArrowUp") {
-    direction = "up";
-  } else if (event.key == "ArrowDown") {
-    direction = "down";
-  } else if (event.key == "ArrowLeft") {
-    direction = "left";
-  } else if (event.key == "ArrowRight") {
-    direction = "right";
+  if (event.key === "ArrowUp" || event.key === "w" || event.key === "W") {
+    setDirection("up");
+  } else if (event.key === "ArrowDown" || event.key === "s" || event.key === "S") {
+    setDirection("down");
+  } else if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") {
+    setDirection("left");
+  } else if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") {
+    setDirection("right");
   }
 });
+
+// Touch / on-screen D-Pad buttons
+const controlButtons = document.querySelectorAll(".ctrl-btn");
+controlButtons.forEach((btn) => {
+  const handlePress = (event) => {
+    event.preventDefault();
+    setDirection(btn.dataset.dir);
+  };
+  btn.addEventListener("pointerdown", handlePress);
+  btn.addEventListener("click", handlePress);
+});
+
+// Virtual Joystick controls
+const joystickBase = document.querySelector("#joystick-base");
+const joystickKnob = document.querySelector("#joystick-knob");
+let isDraggingJoystick = false;
+let joystickCenter = { x: 0, y: 0 };
+const maxDistance = 36;
+const deadZone = 10;
+
+function updateJoystickPosition(clientX, clientY) {
+  const dx = clientX - joystickCenter.x;
+  const dy = clientY - joystickCenter.y;
+  const distance = Math.hypot(dx, dy);
+
+  const clampedDist = Math.min(distance, maxDistance);
+  const angle = Math.atan2(dy, dx);
+
+  const knobX = Math.cos(angle) * clampedDist;
+  const knobY = Math.sin(angle) * clampedDist;
+
+  joystickKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+  joystickKnob.classList.add("active");
+
+  if (distance > deadZone) {
+    if (Math.abs(dx) > Math.abs(dy)) {
+      setDirection(dx > 0 ? "right" : "left");
+    } else {
+      setDirection(dy > 0 ? "down" : "up");
+    }
+  }
+}
+
+if (joystickBase && joystickKnob) {
+  joystickBase.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    isDraggingJoystick = true;
+    try {
+      joystickBase.setPointerCapture(event.pointerId);
+    } catch (_) {}
+    const rect = joystickBase.getBoundingClientRect();
+    joystickCenter = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+    updateJoystickPosition(event.clientX, event.clientY);
+  });
+
+  joystickBase.addEventListener("pointermove", (event) => {
+    if (!isDraggingJoystick) return;
+    event.preventDefault();
+    updateJoystickPosition(event.clientX, event.clientY);
+  });
+
+  const stopJoystick = (event) => {
+    if (!isDraggingJoystick) return;
+    isDraggingJoystick = false;
+    try {
+      joystickBase.releasePointerCapture(event.pointerId);
+    } catch (_) {}
+    joystickKnob.style.transform = "translate(-50%, -50%)";
+    joystickKnob.classList.remove("active");
+  };
+
+  joystickBase.addEventListener("pointerup", stopJoystick);
+  joystickBase.addEventListener("pointercancel", stopJoystick);
+}
+
+// Mode switcher (Joystick vs D-Pad)
+const modeBtns = document.querySelectorAll(".mode-btn");
+const dpadControls = document.querySelector("#dpad-controls");
+const joystickWrapper = document.querySelector("#joystick-wrapper");
+
+function setControlMode(mode) {
+  if (!dpadControls || !joystickWrapper) return;
+  if (mode === "joystick") {
+    dpadControls.style.display = "none";
+    joystickWrapper.style.display = "flex";
+  } else {
+    dpadControls.style.display = "flex";
+    joystickWrapper.style.display = "none";
+  }
+  modeBtns.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+  localStorage.setItem("controlMode", mode);
+}
+
+modeBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setControlMode(btn.dataset.mode);
+  });
+});
+
+// Default to joystick on smaller/mobile devices, otherwise use saved/dpad
+const defaultMode = window.innerWidth <= 768 ? "joystick" : "dpad";
+const savedMode = localStorage.getItem("controlMode") || defaultMode;
+setControlMode(savedMode);
